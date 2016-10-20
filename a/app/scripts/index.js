@@ -3,4 +3,7 @@ var Backbone = require('backbone');
 require('./router');
 
 
-Backbone.History.start();
+// DOM Ready - Call the backbone history
+$(function(){
+  Backbone.history.start();
+}());
