@@ -9,7 +9,7 @@ var Person = Backbone.Model.extend({
 
 var PersonCollection = Backbone.Collection.extend({
   model: Person,
-  url: 'https://tiny-lasagna-server.com/collections/mtpeople'
+  url: 'https://tiny-lasagna-server.herokuapp.com/collections/mtpeople'
 });
 
 module.exports = {

@@ -8,9 +8,9 @@ require('./router');
 // DOM Ready
 $(function(){
   Backbone.history.start();
-}())
+}());
 
-},{"./router":3,"backbone":7,"jquery":28}],2:[function(require,module,exports){
+},{"./router":3,"backbone":8,"jquery":29}],2:[function(require,module,exports){
 "use strict";
 // models
 
@@ -23,14 +23,14 @@ var Person = Backbone.Model.extend({
 
 var PersonCollection = Backbone.Collection.extend({
   model: Person,
-  url: 'https://tiny-lasagna-server.com/collections/mtpeople'
+  url: 'https://tiny-lasagna-server.herokuapp.com/collections/mtpeople'
 });
 
 module.exports = {
   Person: Person,
   PersonCollection: PersonCollection
 }
-},{"Backbone":6,"jquery":28}],3:[function(require,module,exports){
+},{"Backbone":7,"jquery":29}],3:[function(require,module,exports){
 "use strict";
 // Router
 var $ = require('jquery');
@@ -46,28 +46,52 @@ var AppRouter = Backbone.Router.extend({
   },
   initialize: function(){
     this.collection = new models.PersonCollection();
-    this.collection.add({
-      'firstName': 'Marshall',
-      'lastName': 'Thompson',
-      'title': 'Front End Engineer',
-      'address1': '111 N. Calhoun St.',
-      'address2': 'Apt. B',
-      'city': 'Greenville',
-      'state': 'SC',
-      'zip': '29601'
+    
+    this.collection.on('add', function(){
+      console.log('add firing');
     });
+
+    this.collection.add([
+      {
+        'firstName': 'Marshall',
+        'lastName': 'Thompson',
+        'title': 'Front End Engineer',
+        'address1': '111 N. Calhoun St.',
+        'address2': 'Apt. B',
+        'city': 'Greenville',
+        'state': 'SC',
+        'zip': '29601'
+      },
+      {
+        'firstName': 'Todd',
+        'lastName': 'Thompson',
+        'title': 'Front End Engineer',
+        'address1': '111 N. Calhoun St.',
+        'address2': 'Apt. B',
+        'city': 'Greenville',
+        'state': 'SC',
+        'zip': '29601'
+      }
+    ]);
+
+    this.collection.fetch();
   },
   index: function(){
-    console.log('Hello World!');
+    console.log(this.collection);
+
     var formPerson = new views.FormView({collection: this.collection});
+    var personList = new views.PersonList({collection: this.collection});
 
     $('.app')
-      .html(formPerson.render().el);
+      .html(formPerson.render().el)
+      .append(personList.render().el);
   }
 });
 
 var appRouter = new AppRouter();
-},{"./models/person":2,"./views/person":4,"backbone":7,"jquery":28}],4:[function(require,module,exports){
+
+module.exports = appRouter;
+},{"./models/person":2,"./views/person":4,"backbone":8,"jquery":29}],4:[function(require,module,exports){
 "use strict";
 // views
 
@@ -75,25 +99,90 @@ var $ = require('jquery');
 var Backbone = require('backbone');
 // templates
 var formPersonEntry = require('../../templates/form-person-entry.hbs');
+var partialPerson = require('../../templates/partial-person.hbs');
+
 
 var FormView = Backbone.View.extend({
   tagName: 'div',
   className: 'well col-xs-12',
   template: formPersonEntry,
-  initialize: function(){
-    this.listenTo(this.collection, 'add', this.render);
+  events: {
+    'submit form' : 'submitData'
   },
   render: function(){
     this.$el.html(this.template());
     return this;
+  },
+  submitData: function(e){
+    e.preventDefault();
+    console.log('submission stopped');
+    var form = this.$el.find('#person-data');
+    if(form.find('input[type="text"]').val()){
+      var formSerial = form.serializeArray();
+      var formData = {}
+      // loop thru the form serial and add
+      // key/vals to formData object
+      formSerial.forEach(function(field){
+        formData[field.name] = field.value;
+      });
+      this.collection.create(formData);
+      
+      form[0].reset();
+    }
   }
 
 });
 
+
+// describe personlist view
+var PersonList = Backbone.View.extend({
+  tagName: 'div',
+  className: 'people-listing',
+  initialize: function(){
+    console.log('personlist firing');
+    this.listenTo(this.collection, 'add', this.renderPersonView);
+  },
+  render: function(){
+    return this;
+  },
+  renderPersonView: function(person){
+    var personView = new Person({ model: person });
+    this.$el.append(personView.render().el);
+  }
+});
+
+
+// describe person view
+var Person = Backbone.View.extend({
+  tagName: 'div',
+  className: 'col-md-3',
+  events: {
+    'click' : 'removePerson'
+  },
+  template: partialPerson,
+  initialize: function(){
+    console.log('person firing');
+    this.listenTo(this.model, 'destroy', this.remove);
+    this.listenTo(this.model, 'changed', this.render);
+  },
+  render: function(){
+    var context = this.model.toJSON();
+    var renderedPerson = this.template(context);
+    this.$el.html(renderedPerson);
+    
+    return this;   
+  },
+  removePerson: function(){
+    this.model.destroy();
+  }
+}); 
+
 module.exports = {
-  FormView: FormView
-}
-},{"../../templates/form-person-entry.hbs":5,"backbone":7,"jquery":28}],5:[function(require,module,exports){
+  FormView: FormView,
+  PersonList: PersonList,
+  Person: Person
+};
+},{"../../templates/form-person-entry.hbs":5,"../../templates/partial-person.hbs":6,"backbone":8,"jquery":29}],5:[function(require,module,exports){
 "use strict";
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
@@ -101,7 +190,33 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
     return "<form id=\"person-data\" action=\"\">\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-md-4\">\n        <input type=\"text\" name=\"firstName\" placeholder=\"First Name\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-4\">    \n        <input type=\"text\" name=\"lastName\" placeholder=\"Last Name\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-4\">  \n        <input type=\"text\" name=\"title\" placeholder=\"Title\" class=\"form-control\">\n      </div>\n    </div>\n  </div>\n  \n  <div class=\"form-group\">\n    <div class=\"row\">  \n      <div class=\"col-md-6\">\n        <input type=\"text\" name=\"address1\" placeholder=\"Street Address\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-6\">    \n        <input type=\"text\" name=\"address2\" placeholder=\"Apt, Ste Number\" class=\"form-control\">\n      </div>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-md-4\">\n        <input type=\"text\" name=\"city\" placeholder=\"City\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-4\">    \n        <input type=\"text\" name=\"state\" placeholder=\"State\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-4\">  \n        <input type=\"text\" name=\"zip\" placeholder=\"Zip\" class=\"form-control\">\n      </div>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-md-5\">\n        <input type=\"text\" name=\"phone\" placeholder=\"Phone Number\" class=\"form-control\">\n      </div>\n      <div class=\"col-md-5\">    \n        <input type=\"text\" name=\"email\" placeholder=\"Email Address\" class=\"form-control\">\n      </div>\n        <div class=\"col-md-2\">    \n        <input type=\"submit\" value=\"Add Person\" class=\"btn btn-primary\">\n      </div>\n    </div>\n  </div>\n\n\n  </div>\n</form>";
 },"useData":true});
 
-},{"hbsfy/runtime":27}],6:[function(require,module,exports){
+},{"hbsfy/runtime":28}],6:[function(require,module,exports){
+"use strict";
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "<h3>"
+    + alias4(((helper = (helper = helpers.firstName || (depth0 != null ? depth0.firstName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"firstName","hash":{},"data":data}) : helper)))
+    + " "
+    + alias4(((helper = (helper = helpers.lastName || (depth0 != null ? depth0.lastName : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"lastName","hash":{},"data":data}) : helper)))
+    + " <small>"
+    + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
+    + "</small></h3>\n<div>"
+    + alias4(((helper = (helper = helpers.address1 || (depth0 != null ? depth0.address1 : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"address1","hash":{},"data":data}) : helper)))
+    + " "
+    + alias4(((helper = (helper = helpers.address2 || (depth0 != null ? depth0.address2 : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"address2","hash":{},"data":data}) : helper)))
+    + "</div>\n<div>"
+    + alias4(((helper = (helper = helpers.city || (depth0 != null ? depth0.city : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"city","hash":{},"data":data}) : helper)))
+    + ", "
+    + alias4(((helper = (helper = helpers.state || (depth0 != null ? depth0.state : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"state","hash":{},"data":data}) : helper)))
+    + " "
+    + alias4(((helper = (helper = helpers.zip || (depth0 != null ? depth0.zip : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"zip","hash":{},"data":data}) : helper)))
+    + "</div>";
+},"useData":true});
+
+},{"hbsfy/runtime":28}],7:[function(require,module,exports){
 (function (global){
 //     Backbone.js 1.3.3
 
@@ -2025,9 +2140,9 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":28,"underscore":29}],7:[function(require,module,exports){
-arguments[4][6][0].apply(exports,arguments)
-},{"dup":6,"jquery":28,"underscore":29}],8:[function(require,module,exports){
+},{"jquery":29,"underscore":30}],8:[function(require,module,exports){
+arguments[4][7][0].apply(exports,arguments)
+},{"dup":7,"jquery":29,"underscore":30}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2095,7 +2210,7 @@ exports['default'] = inst;
 module.exports = exports['default'];
 
 
-},{"./handlebars/base":9,"./handlebars/exception":12,"./handlebars/no-conflict":22,"./handlebars/runtime":23,"./handlebars/safe-string":24,"./handlebars/utils":25}],9:[function(require,module,exports){
+},{"./handlebars/base":10,"./handlebars/exception":13,"./handlebars/no-conflict":23,"./handlebars/runtime":24,"./handlebars/safe-string":25,"./handlebars/utils":26}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2201,7 +2316,7 @@ exports.createFrame = _utils.createFrame;
 exports.logger = _logger2['default'];
 
 
-},{"./decorators":10,"./exception":12,"./helpers":13,"./logger":21,"./utils":25}],10:[function(require,module,exports){
+},{"./decorators":11,"./exception":13,"./helpers":14,"./logger":22,"./utils":26}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2219,7 +2334,7 @@ function registerDefaultDecorators(instance) {
 }
 
 
-},{"./decorators/inline":11}],11:[function(require,module,exports){
+},{"./decorators/inline":12}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2250,7 +2365,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],12:[function(require,module,exports){
+},{"../utils":26}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2292,7 +2407,7 @@ exports['default'] = Exception;
 module.exports = exports['default'];
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2340,7 +2455,7 @@ function registerDefaultHelpers(instance) {
 }
 
 
-},{"./helpers/block-helper-missing":14,"./helpers/each":15,"./helpers/helper-missing":16,"./helpers/if":17,"./helpers/log":18,"./helpers/lookup":19,"./helpers/with":20}],14:[function(require,module,exports){
+},{"./helpers/block-helper-missing":15,"./helpers/each":16,"./helpers/helper-missing":17,"./helpers/if":18,"./helpers/log":19,"./helpers/lookup":20,"./helpers/with":21}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2381,7 +2496,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],15:[function(require,module,exports){
+},{"../utils":26}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2477,7 +2592,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":12,"../utils":25}],16:[function(require,module,exports){
+},{"../exception":13,"../utils":26}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2504,7 +2619,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":12}],17:[function(require,module,exports){
+},{"../exception":13}],18:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2535,7 +2650,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],18:[function(require,module,exports){
+},{"../utils":26}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2563,7 +2678,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2577,7 +2692,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2612,7 +2727,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],21:[function(require,module,exports){
+},{"../utils":26}],22:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2661,7 +2776,7 @@ exports['default'] = logger;
 module.exports = exports['default'];
 
 
-},{"./utils":25}],22:[function(require,module,exports){
+},{"./utils":26}],23:[function(require,module,exports){
 (function (global){
 /* global window */
 'use strict';
@@ -2685,7 +2800,7 @@ module.exports = exports['default'];
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2979,7 +3094,7 @@ function executeDecorators(fn, prog, container, depths, data, blockParams) {
 }
 
 
-},{"./base":9,"./exception":12,"./utils":25}],24:[function(require,module,exports){
+},{"./base":10,"./exception":13,"./utils":26}],25:[function(require,module,exports){
 // Build out our basic SafeString type
 'use strict';
 
@@ -2996,7 +3111,7 @@ exports['default'] = SafeString;
 module.exports = exports['default'];
 
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -3122,15 +3237,15 @@ function appendContextPath(contextPath, id) {
 }
 
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
 module.exports = require('./dist/cjs/handlebars.runtime')['default'];
 
-},{"./dist/cjs/handlebars.runtime":8}],27:[function(require,module,exports){
+},{"./dist/cjs/handlebars.runtime":9}],28:[function(require,module,exports){
 module.exports = require("handlebars/runtime")["default"];
 
-},{"handlebars/runtime":26}],28:[function(require,module,exports){
+},{"handlebars/runtime":27}],29:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -12946,7 +13061,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
