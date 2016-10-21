@@ -10,15 +10,13 @@ var AppRouter = Backbone.Router.extend({
   initialize: function(){
     // go get collection and set it to this
     this.collection = new models.PostCollection();
-    this.collection.add([
-      {"title": "Hello World", "body":"Hello Everyone!"},
-      {"title": "Hello Again", "body":"suh dude"},
-    ]);
+    this.collection.fetch();
   },
   index: function(){
     // instantiate the blog post view
     var blogPostForm = new views.BlogPostForm({collection: this.collection});
     var blogPosts = new views.BlogPostList({collection: this.collection})    
+    // var wrapper = new views.BlogWrapper();
     // render the form to the app container
     $('#app')
       .html(blogPostForm.render().el)

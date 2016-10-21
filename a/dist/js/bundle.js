@@ -10,7 +10,7 @@ $(function(){
   Backbone.history.start();
 }());
 
-},{"./router":3,"backbone":7,"jquery":28}],2:[function(require,module,exports){
+},{"./router":3,"backbone":8,"jquery":29}],2:[function(require,module,exports){
 "use strict";
 // Models - app/scripts/models
 
@@ -30,7 +30,7 @@ module.exports = {
   Post: Post,
   PostCollection: PostCollection
 }
-},{"backbone":7}],3:[function(require,module,exports){
+},{"backbone":8}],3:[function(require,module,exports){
 "use strict";
 var $ = require('jquery');
 var Backbone = require('backbone');
@@ -44,15 +44,13 @@ var AppRouter = Backbone.Router.extend({
   initialize: function(){
     // go get collection and set it to this
     this.collection = new models.PostCollection();
-    this.collection.add([
-      {"title": "Hello World", "body":"Hello Everyone!"},
-      {"title": "Hello Again", "body":"suh dude"},
-    ]);
+    this.collection.fetch();
   },
   index: function(){
     // instantiate the blog post view
     var blogPostForm = new views.BlogPostForm({collection: this.collection});
     var blogPosts = new views.BlogPostList({collection: this.collection})    
+    // var wrapper = new views.BlogWrapper();
     // render the form to the app container
     $('#app')
       .html(blogPostForm.render().el)
@@ -65,7 +63,7 @@ var AppRouter = Backbone.Router.extend({
 var appRouter = new AppRouter();
 
 module.exports = appRouter;
-},{"./models/post":2,"./views/post":4,"backbone":7,"jquery":28}],4:[function(require,module,exports){
+},{"./models/post":2,"./views/post":4,"backbone":8,"jquery":29}],4:[function(require,module,exports){
 "use strict";
 // Views - app/scripts/views
 
@@ -75,6 +73,18 @@ var Backbone = require('backbone');
 // get form template
 var blogFormTemplate = require('../../templates/postform.hbs');
 var blogPostTemplate = require('../../templates/blogpost.hbs');
+var wrapperTemplate = require('../../templates/app-wrapper.hbs');
+
+// representation of an app wrapper... about to get weird!
+var BlogWrapper = Backbone.View.extend({
+  tagName: 'section',
+  className: 'app-wrapper',
+  template: wrapperTemplate,
+  render: function(){
+    this.$el.html(this.template());
+    return this;
+  }
+});
 
 // representation of a form container
 var BlogPostForm = Backbone.View.extend({
@@ -92,8 +102,13 @@ var BlogPostForm = Backbone.View.extend({
   },
   submit: function(e){
     e.preventDefault();
-    // post data to server
-    console.log('submit heard...');
+    // save data in collection and post data to server
+    this.collection.create({
+      title: $('input[name="title"]').val(),
+      postBody: $('textarea[name="postBody"]').val()
+    });
+    $('#blog-entry')[0]
+      .val('')
   }
 });
 
@@ -106,6 +121,7 @@ var BlogPostList = Backbone.View.extend({
     this.listenTo(this.collection, 'add', this.renderBlogPost);
   },
   render: function(){
+    this.$el.append('<li><h3>Previous Posts</h3></li>')
     return this;
   },
   renderBlogPost: function(post){
@@ -119,16 +135,23 @@ var BlogPostList = Backbone.View.extend({
 var BlogPost = Backbone.View.extend({
   tagName: 'li',
   className: 'list-group-item',
+  events: {
+    'click': 'deletePost'
+  },
   template: blogPostTemplate,
   initialize: function(){
     console.log('blog post called');
     this.listenTo(this.model, 'destroy', this.remove);
+    this.listenTo(this.model, 'changed', this.render)
   },
   render: function(){
     var context = this.model.toJSON();
 
     this.$el.html(this.template(context));
     return this;
+  },
+  deletePost: function(){
+    this.model.destroy();
   }
 });
 
@@ -136,11 +159,20 @@ var BlogPost = Backbone.View.extend({
 module.exports = {
   BlogPostForm: BlogPostForm,
   BlogPostList: BlogPostList,
-  BlogPost: BlogPost
+  BlogPost: BlogPost,
+  BlogWrapper: BlogWrapper
 }
 
 
-},{"../../templates/blogpost.hbs":5,"../../templates/postform.hbs":6,"backbone":7,"jquery":28}],5:[function(require,module,exports){
+},{"../../templates/app-wrapper.hbs":5,"../../templates/blogpost.hbs":6,"../../templates/postform.hbs":7,"backbone":8,"jquery":29}],5:[function(require,module,exports){
+"use strict";
+// hbsfy compiled Handlebars template
+var HandlebarsCompiler = require('hbsfy/runtime');
+module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<div class=\"container\">\n  <div class=\"row\">\n\n  </div>\n</div>\n";
+},"useData":true});
+
+},{"hbsfy/runtime":28}],6:[function(require,module,exports){
 "use strict";
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
@@ -154,15 +186,15 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
     + "</p>";
 },"useData":true});
 
-},{"hbsfy/runtime":27}],6:[function(require,module,exports){
+},{"hbsfy/runtime":28}],7:[function(require,module,exports){
 "use strict";
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<form>\n  <div class=\"form-group\">\n    <input type=\"text\" name=\"title\" class=\"form-control\" id=\"title\" placeholder=\"Title\">\n  </div>\n  <div class=\"form-group\">\n    <input type=\"text\" name=\"postBody\" class=\"form-control\" id=\"post-body\" placeholder=\"Post Body...\">\n  </div>\n  <button type=\"submit\" class=\"btn btn-primary\">Submit</button>\n</form>";
+    return "<form id=\"blog-entry\">\n  <div class=\"form-group\">\n    <input type=\"text\" name=\"title\" class=\"form-control\" id=\"title\" placeholder=\"Title\">\n  </div>\n  <div class=\"form-group\">\n    <textarea name=\"postBody\" class=\"form-control\" id=\"post-body\" placeholder=\"Post Body...\"></textarea>\n  </div>\n  <button type=\"submit\" class=\"btn btn-primary\">Submit</button>\n</form>";
 },"useData":true});
 
-},{"hbsfy/runtime":27}],7:[function(require,module,exports){
+},{"hbsfy/runtime":28}],8:[function(require,module,exports){
 (function (global){
 //     Backbone.js 1.3.3
 
@@ -2086,7 +2118,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"jquery":28,"underscore":29}],8:[function(require,module,exports){
+},{"jquery":29,"underscore":30}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2154,7 +2186,7 @@ exports['default'] = inst;
 module.exports = exports['default'];
 
 
-},{"./handlebars/base":9,"./handlebars/exception":12,"./handlebars/no-conflict":22,"./handlebars/runtime":23,"./handlebars/safe-string":24,"./handlebars/utils":25}],9:[function(require,module,exports){
+},{"./handlebars/base":10,"./handlebars/exception":13,"./handlebars/no-conflict":23,"./handlebars/runtime":24,"./handlebars/safe-string":25,"./handlebars/utils":26}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2260,7 +2292,7 @@ exports.createFrame = _utils.createFrame;
 exports.logger = _logger2['default'];
 
 
-},{"./decorators":10,"./exception":12,"./helpers":13,"./logger":21,"./utils":25}],10:[function(require,module,exports){
+},{"./decorators":11,"./exception":13,"./helpers":14,"./logger":22,"./utils":26}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2278,7 +2310,7 @@ function registerDefaultDecorators(instance) {
 }
 
 
-},{"./decorators/inline":11}],11:[function(require,module,exports){
+},{"./decorators/inline":12}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2309,7 +2341,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],12:[function(require,module,exports){
+},{"../utils":26}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2351,7 +2383,7 @@ exports['default'] = Exception;
 module.exports = exports['default'];
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2399,7 +2431,7 @@ function registerDefaultHelpers(instance) {
 }
 
 
-},{"./helpers/block-helper-missing":14,"./helpers/each":15,"./helpers/helper-missing":16,"./helpers/if":17,"./helpers/log":18,"./helpers/lookup":19,"./helpers/with":20}],14:[function(require,module,exports){
+},{"./helpers/block-helper-missing":15,"./helpers/each":16,"./helpers/helper-missing":17,"./helpers/if":18,"./helpers/log":19,"./helpers/lookup":20,"./helpers/with":21}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2440,7 +2472,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],15:[function(require,module,exports){
+},{"../utils":26}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2536,7 +2568,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":12,"../utils":25}],16:[function(require,module,exports){
+},{"../exception":13,"../utils":26}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2563,7 +2595,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../exception":12}],17:[function(require,module,exports){
+},{"../exception":13}],18:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2594,7 +2626,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],18:[function(require,module,exports){
+},{"../utils":26}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2622,7 +2654,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2636,7 +2668,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2671,7 +2703,7 @@ exports['default'] = function (instance) {
 module.exports = exports['default'];
 
 
-},{"../utils":25}],21:[function(require,module,exports){
+},{"../utils":26}],22:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2720,7 +2752,7 @@ exports['default'] = logger;
 module.exports = exports['default'];
 
 
-},{"./utils":25}],22:[function(require,module,exports){
+},{"./utils":26}],23:[function(require,module,exports){
 (function (global){
 /* global window */
 'use strict';
@@ -2744,7 +2776,7 @@ module.exports = exports['default'];
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -3038,7 +3070,7 @@ function executeDecorators(fn, prog, container, depths, data, blockParams) {
 }
 
 
-},{"./base":9,"./exception":12,"./utils":25}],24:[function(require,module,exports){
+},{"./base":10,"./exception":13,"./utils":26}],25:[function(require,module,exports){
 // Build out our basic SafeString type
 'use strict';
 
@@ -3055,7 +3087,7 @@ exports['default'] = SafeString;
 module.exports = exports['default'];
 
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -3181,15 +3213,15 @@ function appendContextPath(contextPath, id) {
 }
 
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
 module.exports = require('./dist/cjs/handlebars.runtime')['default'];
 
-},{"./dist/cjs/handlebars.runtime":8}],27:[function(require,module,exports){
+},{"./dist/cjs/handlebars.runtime":9}],28:[function(require,module,exports){
 module.exports = require("handlebars/runtime")["default"];
 
-},{"handlebars/runtime":26}],28:[function(require,module,exports){
+},{"handlebars/runtime":27}],29:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -13005,7 +13037,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
