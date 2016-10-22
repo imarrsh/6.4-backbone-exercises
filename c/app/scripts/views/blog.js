@@ -63,7 +63,7 @@ var BlogPostView = Backbone.View.extend({
   tagName: 'section',
   className: 'blog-post-view',
   initialize: function(){
-    console.log(this.model);
+    // console.log(this.model);
     // this.listenTo(this.model, 'changed', this.renderBlogContent);
     this.childView = new BlogPostViewContent({model: this.model});
   },
@@ -82,9 +82,6 @@ var BlogPostViewContent = Backbone.View.extend({
   tagname: 'div',
   className: 'blog-post-content',
   template: blogPostContent,
-  initialize: function(){
-    console.log('hi');
-  },
   render: function(){
     var context = this.model.toJSON();
     this.$el.html(this.template(context));

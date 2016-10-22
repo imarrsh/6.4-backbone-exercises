@@ -7,19 +7,21 @@ var views = require('./views/blog');
 var models = require('./models/blog');
 
 var AppRouter = Backbone.Router.extend({
-  routes: {
-    '' : 'index',
-    'post/:id': 'blogView'
-  },
   initialize: function(){
     // fetch the collection
     this.collection = new models.BlogCollection();
     this.collection.fetch();
   },
+  routes: {
+    'post/:id': 'blogView',
+    '' : 'index'
+  },
   index: function(){
     console.log('Hello World');
+    
     var wrapper = new views.BlogPostListParentView({collection: this.collection});
 
+    console.log(wrapper);
     $('#app')
       .html(wrapper.render().el);
   },
