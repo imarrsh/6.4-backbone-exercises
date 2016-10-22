@@ -21,6 +21,41 @@ img {
   height: 100vh;
 }
 
-.main {
+.blog-post{
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  p {
+    font-size: 18px;
+  }
+}
 
+.blog-post-list{
+  padding-left: 0;
+  .blog-post{
+    list-style: none;
+    margin-bottom: 16px;
+    p{
+      font-size: 16px;
+    }
+    span{
+      color: #777;
+    }
+    p {
+      margin-bottom: 0;
+    }
+    h3 {
+      margin-top: 0;
+    }
+    a{
+      color: inherit;
+      display: block;
+      &:hover {
+        text-decoration: none;
+        & h3 {
+        text-decoration: underline;          
+        }
+      }
+    }
+  }
 }

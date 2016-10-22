@@ -5818,4 +5818,32 @@ img {
   background-color: #eee;
   height: 100vh; }
 
+.blog-post {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px; }
+  .blog-post p {
+    font-size: 18px; }
+
+.blog-post-list {
+  padding-left: 0; }
+  .blog-post-list .blog-post {
+    list-style: none;
+    margin-bottom: 16px; }
+    .blog-post-list .blog-post p {
+      font-size: 16px; }
+    .blog-post-list .blog-post span {
+      color: #777; }
+    .blog-post-list .blog-post p {
+      margin-bottom: 0; }
+    .blog-post-list .blog-post h3 {
+      margin-top: 0; }
+    .blog-post-list .blog-post a {
+      color: inherit;
+      display: block; }
+      .blog-post-list .blog-post a:hover {
+        text-decoration: none; }
+        .blog-post-list .blog-post a:hover h3 {
+          text-decoration: underline; }
+
 /*# sourceMappingURL=app.css.map */
