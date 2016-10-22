@@ -16,7 +16,7 @@ var AppRouter = Backbone.Router.extend({
     this.collection.on('add', function(){
       console.log('add firing');
     });
-
+    // not sure where this needs to go to work proper
     this.collection.add([
       {
         'firstName': 'Marshall',

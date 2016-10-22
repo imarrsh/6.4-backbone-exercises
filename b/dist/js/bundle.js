@@ -50,7 +50,7 @@ var AppRouter = Backbone.Router.extend({
     this.collection.on('add', function(){
       console.log('add firing');
     });
-
+    // not sure where this needs to go to work proper
     this.collection.add([
       {
         'firstName': 'Marshall',
@@ -116,7 +116,9 @@ var FormView = Backbone.View.extend({
   submitData: function(e){
     e.preventDefault();
     console.log('submission stopped');
+    
     var form = this.$el.find('#person-data');
+
     if(form.find('input[type="text"]').val()){
       var formSerial = form.serializeArray();
       var formData = {}

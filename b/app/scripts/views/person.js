@@ -21,7 +21,9 @@ var FormView = Backbone.View.extend({
   submitData: function(e){
     e.preventDefault();
     console.log('submission stopped');
+    
     var form = this.$el.find('#person-data');
+
     if(form.find('input[type="text"]').val()){
       var formSerial = form.serializeArray();
       var formData = {}
