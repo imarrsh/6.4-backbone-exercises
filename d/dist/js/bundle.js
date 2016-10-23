@@ -118,13 +118,13 @@ var BookmarkList = Backbone.View.extend({
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',
-  className: 'bookmark-item',
+  className: 'list-group-item',
   initialize: function(){
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'changed', this.render);
   },
   events: {
-    'click .remove-bookmark': 'remove'
+    'click .remove-bookmark': 'removeBookmark'
   },
   template: bookmarkItemTemplate,
   render: function(){
@@ -132,7 +132,7 @@ var BookmarkItem = Backbone.View.extend({
     this.$el.html(this.template(context))
     return this;
   },
-  remove: function(){
+  removeBookmark: function(){
     this.model.destroy();
   }
 
@@ -150,13 +150,11 @@ var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<a href=\"#/bookmark/"
-    + alias4(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"_id","hash":{},"data":data}) : helper)))
-    + "\" class=\"list-group-item\">\n  <h4>\n    "
+  return "<h4 class=\"bookmark-item\">\n  "
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>"
     + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))
-    + "</small> \n    <span class=\"controls\">\n      <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n      <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n    </span>\n  </h4>\n</a>";
+    + "</small> \n  <span class=\"controls\">\n    <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n    <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n  </span>\n</h4>\n";
 },"useData":true});
 
 },{"hbsfy/runtime":27}],6:[function(require,module,exports){

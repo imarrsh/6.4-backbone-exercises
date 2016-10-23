@@ -49,13 +49,13 @@ var BookmarkList = Backbone.View.extend({
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',
-  className: 'bookmark-item',
+  className: 'list-group-item',
   initialize: function(){
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'changed', this.render);
   },
   events: {
-    'click .remove-bookmark': 'remove'
+    'click .remove-bookmark': 'removeBookmark'
   },
   template: bookmarkItemTemplate,
   render: function(){
@@ -63,7 +63,7 @@ var BookmarkItem = Backbone.View.extend({
     this.$el.html(this.template(context))
     return this;
   },
-  remove: function(){
+  removeBookmark: function(){
     this.model.destroy();
   }
 
