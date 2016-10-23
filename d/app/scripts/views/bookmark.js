@@ -37,6 +37,7 @@ var BookmarkList = Backbone.View.extend({
   className: 'list-group bookmarks-list',
   initialize: function(){
     this.listenTo(this.collection, 'add', this.getBookmarkItem);
+    this.listenTo(this.collection, 'changed', this.getBookmarkItem);
   },
   render: function(){
     return this;
@@ -47,6 +48,7 @@ var BookmarkList = Backbone.View.extend({
   }
 
 });
+
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',

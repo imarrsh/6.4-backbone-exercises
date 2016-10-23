@@ -49,7 +49,7 @@ var views = require('./views/bookmark');
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'tags/:tag': 'showOnlyTags'
+    'tag/:tag': 'showOnlyTag'
   },
   initialize: function(){
     this.collection = new models.BookmarkCollection();
@@ -60,26 +60,30 @@ var AppRouter = Backbone.Router.extend({
   },
   index: function(){
     console.log('home view');
+    
     var bookmarkList = new views.BookmarkList({
           collection: this.collection
         });
+    
+    console.log(bookmarkList); // collection
 
     $('#app')
       .html(this.form.render().el)
       .append(bookmarkList.render().el);
   },
-  showOnlyTags: function(tag){
+  showOnlyTag: function(tag){
     console.log('bookmark view', tag);
 
-    var bookmarkList = new views.BookmarkList({
-      collection: this.collection.filter({tag: tag})
+    var filteredBMarks = this.collection.filter(function(model){
+      console.log(model.get('tag'));
+      return model.get('tag') === tag;
     });
 
-    console.log('bookmark view', bookmarkList);
+    var filteredBMarkList = new views.BookmarkList({collection: filteredBMarks});
 
     $('#app')
       .html(this.form.render().el)
-      .append(bookmarkList.render().el);
+      .append(filteredBMarkList.render().el);
   }
 });
 
@@ -127,6 +131,7 @@ var BookmarkList = Backbone.View.extend({
   className: 'list-group bookmarks-list',
   initialize: function(){
     this.listenTo(this.collection, 'add', this.getBookmarkItem);
+    this.listenTo(this.collection, 'changed', this.getBookmarkItem);
   },
   render: function(){
     return this;
@@ -137,6 +142,7 @@ var BookmarkList = Backbone.View.extend({
   }
 
 });
+
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',
@@ -174,7 +180,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 
   return "<div class=\"bookmark-item\">\n  <span class=\"controls\">\n    <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n    <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n  </span>\n  <h4>"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\n    <button class=\"btn btn-xs btn-default\">\n      <small><a href=\"#tags/"
+    + "\n    <button class=\"btn btn-xs btn-default\">\n      <small><a href=\"#tag/"
     + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))
     + "\">"
     + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))

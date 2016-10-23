@@ -21,7 +21,7 @@ var AppRouter = Backbone.Router.extend({
     
     var wrapper = new views.BlogPostListParentView({collection: this.collection});
 
-    console.log(wrapper);
+    console.log(wrapper); // cid is different each time
     $('#app')
       .html(wrapper.render().el);
   },
@@ -41,7 +41,8 @@ var AppRouter = Backbone.Router.extend({
     // go get blog post view
     var postView = new views.BlogPostView({model: post});
     
-    $('#app').html(postView.render().el);
+    $('#app')
+    .html(postView.render().el);
   }
 });
 

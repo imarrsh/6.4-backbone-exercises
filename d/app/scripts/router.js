@@ -8,7 +8,7 @@ var views = require('./views/bookmark');
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'tags/:tag': 'showOnlyTags'
+    'tag/:tag': 'showOnlyTag'
   },
   initialize: function(){
     this.collection = new models.BookmarkCollection();
@@ -19,26 +19,30 @@ var AppRouter = Backbone.Router.extend({
   },
   index: function(){
     console.log('home view');
+    
     var bookmarkList = new views.BookmarkList({
           collection: this.collection
         });
+    
+    console.log(bookmarkList); // collection
 
     $('#app')
       .html(this.form.render().el)
       .append(bookmarkList.render().el);
   },
-  showOnlyTags: function(tag){
+  showOnlyTag: function(tag){
     console.log('bookmark view', tag);
 
-    var bookmarkList = new views.BookmarkList({
-      collection: this.collection.filter({tag: tag})
+    var filteredBMarks = this.collection.filter(function(model){
+      console.log(model.get('tag'));
+      return model.get('tag') === tag;
     });
 
-    console.log('bookmark view', bookmarkList);
+    var filteredBMarkList = new views.BookmarkList({collection: filteredBMarks});
 
     $('#app')
       .html(this.form.render().el)
-      .append(bookmarkList.render().el);
+      .append(filteredBMarkList.render().el);
   }
 });
 

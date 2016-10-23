@@ -53,7 +53,7 @@ var AppRouter = Backbone.Router.extend({
     
     var wrapper = new views.BlogPostListParentView({collection: this.collection});
 
-    console.log(wrapper);
+    console.log(wrapper); // cid is different each time
     $('#app')
       .html(wrapper.render().el);
   },
@@ -73,7 +73,8 @@ var AppRouter = Backbone.Router.extend({
     // go get blog post view
     var postView = new views.BlogPostView({model: post});
     
-    $('#app').html(postView.render().el);
+    $('#app')
+    .html(postView.render().el);
   }
 });
 
@@ -105,7 +106,7 @@ var BlogPostListParentView = Backbone.View.extend({
     // append the child view
     this.$el.find('.content').append(this.childView.$el);
     // render the child view
-    this.childView.render().el;
+    this.childView;
 
     return this;
   }
@@ -116,6 +117,7 @@ var BlogPostList = Backbone.View.extend({
   className: 'blog-post-list',
   initialize: function(){
     // listen for add events on the collection
+    this.render();
     this.listenTo(this.collection, 'add', this.renderBlogPostItem)
   },
   render: function(){
@@ -216,7 +218,7 @@ var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<!-- blog post view -->\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-xs-12\">\n      <div class=\"blog-post\">\n        <h3>"
+  return "<!-- blog post view -->\n<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-xs-12\">\n      <a href=\"\"><button>&lt; Back</button></a>\n      <div class=\"blog-post\">\n        <h3>"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "</h3>\n        <h5>"
     + alias4(((helper = (helper = helpers.author || (depth0 != null ? depth0.author : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"author","hash":{},"data":data}) : helper)))

@@ -21,7 +21,7 @@ var BlogPostListParentView = Backbone.View.extend({
     // append the child view
     this.$el.find('.content').append(this.childView.$el);
     // render the child view
-    this.childView.render().el;
+    this.childView;
 
     return this;
   }
@@ -32,6 +32,7 @@ var BlogPostList = Backbone.View.extend({
   className: 'blog-post-list',
   initialize: function(){
     // listen for add events on the collection
+    this.render();
     this.listenTo(this.collection, 'add', this.renderBlogPostItem)
   },
   render: function(){
