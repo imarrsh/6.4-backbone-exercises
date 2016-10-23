@@ -96,6 +96,7 @@ var BookmarkForm = Backbone.View.extend({
       newModel[field.name] = field.value;
     });
     this.collection.create(newModel);
+    $('#bookmark-form')[0].reset();
   }
 });
 
@@ -118,7 +119,7 @@ var BookmarkList = Backbone.View.extend({
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',
-  className: 'list-group-item',
+  className: 'list-group-item bookmark-li',
   initialize: function(){
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'changed', this.render);
@@ -129,7 +130,7 @@ var BookmarkItem = Backbone.View.extend({
   template: bookmarkItemTemplate,
   render: function(){
     var context = this.model.toJSON();
-    this.$el.html(this.template(context))
+    this.$el.html(this.template(context));
     return this;
   },
   removeBookmark: function(){
@@ -150,11 +151,15 @@ var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<h4 class=\"bookmark-item\">\n  "
+  return "<div class=\"bookmark-item\">\n  <span class=\"controls\">\n    <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n    <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n  </span>\n  <h4>"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + " <small>"
+    + "\n    <button class=\"btn btn-xs btn-default\">\n      <small>"
     + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))
-    + "</small> \n  <span class=\"controls\">\n    <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n    <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n  </span>\n</h4>\n";
+    + "</small>\n    </button>\n  </h4> \n  <div class=\"link\"><a href=\""
+    + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + "</a></div>\n</div>\n";
 },"useData":true});
 
 },{"hbsfy/runtime":27}],6:[function(require,module,exports){
@@ -162,7 +167,7 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 // hbsfy compiled Handlebars template
 var HandlebarsCompiler = require('hbsfy/runtime');
 module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<form id=\"bookmark-form\" action=\"\">\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-md-6\">\n        <input type=\"url\" name=\"url\" class=\"form-control\" placeholder=\"URL: (ex: https://google.com)\">\n      </div>\n      <div class=\"col-md-4\">\n        <input type=\"text\" name=\"title\" class=\"form-control\" placeholder=\"Title\">\n      </div>\n      <div class=\"col-md-2\">\n        <input type=\"text\" name=\"tag\" class=\"form-control\" placeholder=\"Tag\">\n      </div>\n    </div>\n  </div>\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-xs-12\">\n        <input type=\"submit\" class=\"btn btn-primary btn-submit-right\" value=\"Add\">\n      </div>\n    </div>\n  </div>\n\n</form>";
+    return "<form id=\"bookmark-form\" action=\"\">\n\n  <div class=\"form-group\">\n    <div class=\"row\">\n      <div class=\"col-md-5\">\n        <input type=\"url\" name=\"url\" class=\"form-control\" placeholder=\"URL: (ex: https://google.com)\">\n      </div>\n      <div class=\"col-md-4\">\n        <input type=\"text\" name=\"title\" class=\"form-control\" placeholder=\"Title\">\n      </div>\n      <div class=\"col-md-2\">\n        <input type=\"text\" name=\"tag\" class=\"form-control\" placeholder=\"Tag\">\n      </div>\n      <div class=\"col-md-1\">\n        <input type=\"submit\" class=\"btn btn-primary form-control\" value=\"Add\">\n      </div>\n    </div>\n  </div>\n\n</form>";
 },"useData":true});
 
 },{"hbsfy/runtime":27}],7:[function(require,module,exports){

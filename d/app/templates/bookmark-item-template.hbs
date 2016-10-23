@@ -1,7 +1,12 @@
-<h4 class="bookmark-item">
-  {{title}} <small>{{tag}}</small> 
+<div class="bookmark-item">
   <span class="controls">
     <i class="glyphicon glyphicon-pencil edit-bookmark"  title="Edit"></i> 
     <i class="glyphicon glyphicon-remove remove-bookmark" title="Delete"></i>
   </span>
-</h4>
+  <h4>{{title}}
+    <button class="btn btn-xs btn-default">
+      <small>{{tag}}</small>
+    </button>
+  </h4> 
+  <div class="link"><a href="{{url}}">{{url}}</a></div>
+</div>

@@ -32,13 +32,15 @@ img {
     display: block;
   }
   .controls {
-    display: inline-block;
     opacity: 0;
     float: right;
     .remove-bookmark {
       color: tomato;
     }
   }
+}
+
+.bookmark-li{
   &:hover {
     .controls {
       opacity: 1;

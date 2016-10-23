@@ -27,6 +27,7 @@ var BookmarkForm = Backbone.View.extend({
       newModel[field.name] = field.value;
     });
     this.collection.create(newModel);
+    $('#bookmark-form')[0].reset();
   }
 });
 
@@ -49,7 +50,7 @@ var BookmarkList = Backbone.View.extend({
 
 var BookmarkItem = Backbone.View.extend({
   tagName: 'li',
-  className: 'list-group-item',
+  className: 'list-group-item bookmark-li',
   initialize: function(){
     this.listenTo(this.model, 'destroy', this.remove);
     this.listenTo(this.model, 'changed', this.render);
@@ -60,7 +61,7 @@ var BookmarkItem = Backbone.View.extend({
   template: bookmarkItemTemplate,
   render: function(){
     var context = this.model.toJSON();
-    this.$el.html(this.template(context))
+    this.$el.html(this.template(context));
     return this;
   },
   removeBookmark: function(){

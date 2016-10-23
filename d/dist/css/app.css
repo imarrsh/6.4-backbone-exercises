@@ -5827,12 +5827,12 @@ img {
   .bookmark-item a {
     display: block; }
   .bookmark-item .controls {
-    display: inline-block;
     opacity: 0;
     float: right; }
     .bookmark-item .controls .remove-bookmark {
       color: tomato; }
-  .bookmark-item:hover .controls {
-    opacity: 1; }
+
+.bookmark-li:hover .controls {
+  opacity: 1; }
 
 /*# sourceMappingURL=app.css.map */
