@@ -17,7 +17,7 @@ img {
 }
 
 .wrapper {
-  height: 100vh;
+  min-height: 100vh;
   background-color: #eee;
 }
 
@@ -30,6 +30,9 @@ img {
   list-style: none;
   a {
     display: block;
+  }
+  button a {
+    display: inline;
   }
   .controls {
     opacity: 0;

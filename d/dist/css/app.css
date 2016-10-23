@@ -5815,7 +5815,7 @@ img {
   max-width: 100%; }
 
 .wrapper {
-  height: 100vh;
+  min-height: 100vh;
   background-color: #eee; }
 
 .btn-submit-right {
@@ -5826,6 +5826,8 @@ img {
   list-style: none; }
   .bookmark-item a {
     display: block; }
+  .bookmark-item button a {
+    display: inline; }
   .bookmark-item .controls {
     opacity: 0;
     float: right; }

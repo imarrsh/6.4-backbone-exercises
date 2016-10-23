@@ -2,6 +2,15 @@
 
 var Backbone = require('backbone');
 
+// not sure about this
+var ViewModel = Backbone.Model.extend({
+  defaults: {
+    'currentView': 'home'
+  }
+});
+// maybe delete it soon
+
+
 var Bookmark = Backbone.Model.extend({
   idAttribute: "_id"
 });

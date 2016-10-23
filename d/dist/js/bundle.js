@@ -15,6 +15,15 @@ $(function(){
 
 var Backbone = require('backbone');
 
+// not sure about this
+var ViewModel = Backbone.Model.extend({
+  defaults: {
+    'currentView': 'home'
+  }
+});
+// maybe delete it soon
+
+
 var Bookmark = Backbone.Model.extend({
   idAttribute: "_id"
 });
@@ -40,25 +49,37 @@ var views = require('./views/bookmark');
 var AppRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'bookmark/:id': 'goToBookmark'
+    'tags/:tag': 'showOnlyTags'
   },
   initialize: function(){
     this.collection = new models.BookmarkCollection();
     this.collection.fetch();
+    // attach the form to the router
+    this.form = new views.BookmarkForm({collection: this.collection});
+    
   },
   index: function(){
     console.log('home view');
-    var form = new views.BookmarkForm({collection: this.collection}),
-        bookmarkList = new views.BookmarkList({
+    var bookmarkList = new views.BookmarkList({
           collection: this.collection
         });
 
     $('#app')
-      .html(form.render().el)
+      .html(this.form.render().el)
       .append(bookmarkList.render().el);
   },
-  goToBookmark: function(id){
-    console.log('bookmark view', id);
+  showOnlyTags: function(tag){
+    console.log('bookmark view', tag);
+
+    var bookmarkList = new views.BookmarkList({
+      collection: this.collection.filter({tag: tag})
+    });
+
+    console.log('bookmark view', bookmarkList);
+
+    $('#app')
+      .html(this.form.render().el)
+      .append(bookmarkList.render().el);
   }
 });
 
@@ -153,9 +174,11 @@ module.exports = HandlebarsCompiler.template({"compiler":[7,">= 4.0.0"],"main":f
 
   return "<div class=\"bookmark-item\">\n  <span class=\"controls\">\n    <i class=\"glyphicon glyphicon-pencil edit-bookmark\"  title=\"Edit\"></i> \n    <i class=\"glyphicon glyphicon-remove remove-bookmark\" title=\"Delete\"></i>\n  </span>\n  <h4>"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\n    <button class=\"btn btn-xs btn-default\">\n      <small>"
+    + "\n    <button class=\"btn btn-xs btn-default\">\n      <small><a href=\"#tags/"
     + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))
-    + "</small>\n    </button>\n  </h4> \n  <div class=\"link\"><a href=\""
+    + "\">"
+    + alias4(((helper = (helper = helpers.tag || (depth0 != null ? depth0.tag : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tag","hash":{},"data":data}) : helper)))
+    + "</a></small>\n    </button>\n  </h4> \n  <div class=\"link\"><a href=\""
     + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
     + "\">"
     + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
