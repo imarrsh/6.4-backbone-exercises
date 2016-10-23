@@ -1,7 +1,7 @@
 
 // Bootstrap Variables
 $icon-font-path: '../../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
-
+$grid-gutter-width: 16px;
 // Import Bootstrap
 @import '../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap';
 
@@ -14,4 +14,34 @@ $icon-font-path: '../../node_modules/bootstrap-sass/assets/fonts/bootstrap/';
 
 img {
   max-width: 100%;
+}
+
+.wrapper {
+  height: 100vh;
+  background-color: #eee;
+}
+
+.btn-submit-right {
+  float: right;
+  width: 125px;
+}
+
+.bookmark-item {
+  list-style: none;
+  a {
+    display: block;
+  }
+  .controls {
+    display: inline-block;
+    opacity: 0;
+    float: right;
+    .remove-bookmark {
+      color: tomato;
+    }
+  }
+  &:hover {
+    .controls {
+      opacity: 1;
+    }
+  }
 }
